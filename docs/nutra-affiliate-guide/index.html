@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nutra Affiliate Operations — Complete Guide</title>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+  :root {
+    --bg: #0f1117;
+    --sidebar-bg: #161822;
+    --card-bg: #1c1f2e;
+    --border: #2a2d3e;
+    --text: #d8dae5;
+    --text-muted: #8b8fa3;
+    --accent: #7b9aff;
+    --accent-dim: #4a6adf;
+    --green: #34d399;
+    --yellow: #fbbf24;
+    --red: #f87171;
+    --orange: #fb923c;
+    --tip-bg: rgba(52, 211, 153, 0.08);
+    --tip-border: var(--green);
+    --warn-bg: rgba(251, 191, 36, 0.08);
+    --warn-border: var(--yellow);
+    --danger-bg: rgba(248, 113, 113, 0.08);
+    --danger-border: var(--red);
+    --info-bg: rgba(123, 154, 255, 0.08);
+    --info-border: var(--accent);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+    font-size: 17px;
+    line-height: 1.75;
+  }
+
+  /* ─── Sidebar ─── */
+  #sidebar {
+    width: 320px;
+    min-width: 320px;
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  #sidebar-header {
+    padding: 24px 22px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  #sidebar-header h1 {
+    font-size: 18px;
+    color: var(--accent);
+    margin-bottom: 4px;
+    letter-spacing: -0.3px;
+  }
+
+  #sidebar-header p {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  #search-box {
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  #search-input {
+    width: 100%;
+    padding: 10px 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  #search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(123,154,255,0.15); }
+  #search-input::placeholder { color: var(--text-muted); }
+
+  #nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 12px 22px;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: all 0.15s;
+    gap: 12px;
+  }
+
+  .nav-item:hover { background: rgba(108, 140, 255, 0.06); }
+  .nav-item.active {
+    background: rgba(108, 140, 255, 0.1);
+    border-left-color: var(--accent);
+  }
+
+  .nav-num {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+    min-width: 26px;
+    text-align: right;
+    padding-top: 3px;
+  }
+
+  .nav-item.active .nav-num { color: var(--accent); }
+
+  .nav-text {
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--text-muted);
+  }
+
+  .nav-item.active .nav-text { color: var(--text); font-weight: 600; }
+
+  .nav-tag {
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    margin-top: 4px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  .tag-day { background: rgba(108, 140, 255, 0.15); color: var(--accent); }
+  .tag-parallel { background: rgba(251, 191, 36, 0.15); color: var(--yellow); }
+
+  /* Read progress in sidebar */
+  #reading-stats {
+    padding: 14px 22px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-muted);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  #reading-stats .bar {
+    flex: 1;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-left: 12px;
+    overflow: hidden;
+  }
+
+  #reading-stats .bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.3s;
+  }
+
+  /* ─── Main Content ─── */
+  #main {
+    flex: 1;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+  }
+
+  #content {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 48px 56px 120px;
+  }
+
+  /* Progress bar top */
+  #progress-bar {
+    position: fixed;
+    top: 0;
+    left: 320px;
+    right: 0;
+    height: 3px;
+    background: var(--border);
+    z-index: 100;
+  }
+
+  #progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--green));
+    width: 0%;
+    transition: width 0.3s;
+  }
+
+  /* ─── Chapter sections ─── */
+  .chapter-section {
+    padding-bottom: 40px;
+    margin-bottom: 20px;
+  }
+
+  .chapter-section + .chapter-section {
+    border-top: 2px solid var(--border);
+    padding-top: 50px;
+  }
+
+  /* ─── Typography ─── */
+  #content h1 {
+    font-size: 32px;
+    margin: 56px 0 24px;
+    padding-bottom: 14px;
+    border-bottom: 3px solid var(--accent);
+    color: #fff;
+    letter-spacing: -0.5px;
+    line-height: 1.3;
+  }
+
+  .chapter-section > h1:first-child { margin-top: 0; }
+
+  #content h2 {
+    font-size: 25px;
+    margin: 44px 0 18px;
+    color: var(--accent);
+    letter-spacing: -0.3px;
+    line-height: 1.35;
+  }
+
+  #content h3 {
+    font-size: 20px;
+    margin: 32px 0 14px;
+    color: #ddd;
+    line-height: 1.4;
+  }
+
+  #content h4 {
+    font-size: 17px;
+    margin: 24px 0 12px;
+    color: var(--text-muted);
+    font-weight: 700;
+  }
+
+  #content p {
+    margin: 12px 0;
+    line-height: 1.8;
+    font-size: 17px;
+  }
+
+  #content strong { color: #fff; }
+
+  #content em { color: var(--yellow); font-style: normal; }
+
+  #content a {
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.15s;
+  }
+
+  #content a:hover { border-bottom-color: var(--accent); }
+
+  #content ul, #content ol {
+    margin: 12px 0 12px 28px;
+    line-height: 1.85;
+    font-size: 17px;
+  }
+
+  #content li {
+    margin: 6px 0;
+    padding-left: 4px;
+  }
+
+  #content li::marker { color: var(--accent); }
+
+  #content hr {
+    border: none;
+    border-top: 2px solid var(--border);
+    margin: 50px 0;
+  }
+
+  /* ─── Code blocks ─── */
+  #content pre {
+    background: #0c0e18;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    overflow-x: auto;
+    margin: 18px 0;
+    font-size: 14.5px;
+    line-height: 1.65;
+  }
+
+  #content code {
+    font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Consolas', monospace;
+    font-size: 14.5px;
+  }
+
+  #content p code, #content li code, #content td code {
+    background: rgba(123, 154, 255, 0.12);
+    padding: 2px 8px;
+    border-radius: 5px;
+    font-size: 15px;
+    color: var(--accent);
+  }
+
+  /* ─── Tables ─── */
+  #content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 18px 0;
+    font-size: 15px;
+  }
+
+  #content th {
+    background: var(--card-bg);
+    padding: 12px 14px;
+    text-align: left;
+    border: 1px solid var(--border);
+    font-weight: 700;
+    color: var(--accent);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  #content td {
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.6;
+  }
+
+  #content tr:nth-child(even) { background: rgba(255,255,255,0.015); }
+  #content tr:hover { background: rgba(108, 140, 255, 0.05); }
+
+  /* ─── Blockquotes — styled as callout boxes ─── */
+  #content blockquote {
+    border-left: 4px solid var(--accent);
+    background: var(--info-bg);
+    padding: 18px 22px;
+    margin: 20px 0;
+    border-radius: 0 10px 10px 0;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+  #content blockquote p { margin: 6px 0; }
+
+  /* ─── Details/Summary (quiz answers) ─── */
+  #content details {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin: 22px 0;
+    overflow: hidden;
+  }
+
+  #content summary {
+    padding: 16px 22px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 17px;
+    color: var(--accent);
+    user-select: none;
+    transition: background 0.15s;
+    list-style: none;
+  }
+
+  #content summary::-webkit-details-marker { display: none; }
+
+  #content summary::before {
+    content: '+ ';
+    font-weight: 400;
+    margin-right: 4px;
+    color: var(--text-muted);
+  }
+
+  #content details[open] summary::before { content: '- '; }
+
+  #content summary:hover { background: rgba(108, 140, 255, 0.06); }
+
+  #content details[open] summary {
+    border-bottom: 1px solid var(--border);
+    background: rgba(108, 140, 255, 0.04);
+  }
+
+  #content details > *:not(summary) {
+    padding: 0 22px;
+  }
+
+  #content details > pre {
+    margin: 18px 22px;
+  }
+
+  #content details h3 {
+    margin-top: 20px;
+  }
+
+  /* ─── Scrollbar ─── */
+  ::-webkit-scrollbar { width: 7px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: #3a3d5e; }
+
+  /* ─── Back to top ─── */
+  #back-to-top {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 20px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    z-index: 50;
+  }
+
+  #back-to-top:hover {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+
+  /* ─── Mobile hamburger ─── */
+  #menu-toggle {
+    display: none;
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 200;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 20px;
+  }
+
+  #overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 140;
+  }
+
+  @media (max-width: 900px) {
+    #sidebar {
+      position: fixed;
+      z-index: 150;
+      transform: translateX(-100%);
+      transition: transform 0.25s;
+    }
+    #sidebar.open { transform: translateX(0); }
+    #sidebar.open ~ #overlay { display: block; }
+    #menu-toggle { display: flex; align-items: center; justify-content: center; }
+    #content { padding: 50px 24px 120px; }
+    #progress-bar { left: 0; }
+    #content h1 { font-size: 26px; }
+    #content h2 { font-size: 22px; }
+    #content h3 { font-size: 18px; }
+    #content p, #content li { font-size: 16px; }
+    #content pre { font-size: 12.5px; padding: 14px 16px; }
+    #content table { font-size: 13px; }
+    #content code { font-size: 12.5px; }
+  }
+
+  /* ─── Print ─── */
+  @media print {
+    #sidebar, #progress-bar, #menu-toggle, #back-to-top { display: none !important; }
+    #main { overflow: visible; }
+    #content { max-width: 100%; padding: 0; }
+    body { background: #fff; color: #222; }
+    #content h1 { color: #111; border-bottom-color: #333; }
+    #content h2 { color: #333; }
+    #content pre { background: #f5f5f5; border-color: #ddd; }
+  }
+</style>
+</head>
+<body>
+
+<button id="menu-toggle" onclick="toggleSidebar()">&#9776;</button>
+<div id="overlay" onclick="toggleSidebar()"></div>
+
+<div id="sidebar">
+  <div id="sidebar-header">
+    <h1>Nutra Affiliate Ops</h1>
+    <p>Complete Guide — 14 Days</p>
+  </div>
+  <div id="search-box">
+    <input type="text" id="search-input" placeholder="Tim kiem... (nhan /)" oninput="filterNav(this.value)">
+  </div>
+  <div id="nav"></div>
+  <div id="reading-stats">
+    <span id="progress-text">0% da doc</span>
+    <div class="bar"><div class="bar-fill" id="sidebar-progress"></div></div>
+  </div>
+</div>
+
+<div id="progress-bar"><div id="progress-fill"></div></div>
+
+<div id="main">
+  <div id="content">
+    <div id="loading" style="display:flex;align-items:center;justify-content:center;height:60vh;font-size:18px;color:var(--text-muted)">
+      <div class="spinner" style="width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;margin-right:14px"></div>
+      Dang tai noi dung...
+    </div>
+  </div>
+</div>
+
+<button id="back-to-top" onclick="document.getElementById('main').scrollTo({top:0,behavior:'smooth'})">&#8593;</button>
+
+<script>
+const chapters = [
+  { num: "01", title: "Tong quan nganh Nutra Affiliate", file: "01-tong-quan-nganh.md", days: "Ngay 1-2", icon: "1" },
+  { num: "02", title: "Mo hinh kinh doanh & Dong tien", file: "02-mo-hinh-kinh-doanh.md", days: "Ngay 2-3", icon: "2" },
+  { num: "03", title: "He sinh thai cac ben tham gia", file: "03-he-sinh-thai.md", days: "Ngay 3-4", icon: "3" },
+  { num: "04", title: "GEO — Thi truong CIS, Asia, Latam", file: "04-geo-thi-truong.md", days: "Ngay 4-5", icon: "4" },
+  { num: "05", title: "Offer Management & Optimization", file: "05-offer-management.md", days: "Ngay 5-6", icon: "5" },
+  { num: "06", title: "Tracking, Data Flow & Dashboard", file: "06-tracking-dashboard.md", days: "Ngay 7-8", icon: "6" },
+  { num: "07", title: "Doc so lieu & Phan tich hieu suat", file: "07-doc-so-lieu.md", days: "Ngay 8-9", icon: "7" },
+  { num: "08", title: "Van de thuong gap & Cach xu ly", file: "08-van-de-thuong-gap.md", days: "Ngay 10-11", icon: "8" },
+  { num: "09", title: "SOP & Framework van hanh", file: "09-sop-framework.md", days: "Ngay 12-13", icon: "9" },
+  { num: "10", title: "Checklist & Case Studies", file: "10-checklist-case-study.md", days: "Ngay 14", icon: "10" },
+  { num: "11", title: "Bao cao mau — Tap doc so", file: "11-bao-cao-mau.md", days: "Song song", icon: "11" },
+  { num: "12", title: "Bai tap thuc hanh & Dap an", file: "12-bai-tap-va-dap-an.md", days: "Song song", icon: "12" },
+];
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+// Build nav
+const navEl = document.getElementById('nav');
+chapters.forEach((ch, i) => {
+  const tagClass = ch.days.includes('Song') ? 'tag-parallel' : 'tag-day';
+  const item = document.createElement('div');
+  item.className = 'nav-item' + (i === 0 ? ' active' : '');
+  item.dataset.index = i;
+  item.innerHTML = `
+    <span class="nav-num">${ch.num}</span>
+    <span class="nav-text">${ch.title}<br><span class="nav-tag ${tagClass}">${ch.days}</span></span>
+  `;
+  item.onclick = () => {
+    const target = document.getElementById('chapter-' + i);
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    if (window.innerWidth <= 900) {
+      document.getElementById('sidebar').classList.remove('open');
+    }
+  };
+  navEl.appendChild(item);
+});
+
+// Load all markdown
+async function loadContent() {
+  const contentEl = document.getElementById('content');
+  let allHtml = '';
+
+  for (let i = 0; i < chapters.length; i++) {
+    const ch = chapters[i];
+    try {
+      const resp = await fetch(ch.file);
+      if (!resp.ok) throw new Error('Not found');
+      let md = await resp.text();
+      const html = marked.parse(md);
+      allHtml += `<div id="chapter-${i}" class="chapter-section" data-index="${i}">${html}</div>`;
+    } catch (e) {
+      allHtml += `<div id="chapter-${i}" class="chapter-section" data-index="${i}">
+        <h1>Chuong ${ch.num}: ${ch.title}</h1>
+        <p style="color:var(--red);font-size:17px">Khong the tai file: <strong>${ch.file}</strong></p>
+        <blockquote>
+        <p><strong>Cach mo:</strong> File HTML nay can chay qua local server. Mo Terminal va chay:</p>
+        <pre><code>cd ${location.pathname.replace('/index.html','')} && python3 -m http.server 8080</code></pre>
+        <p>Sau do mo trinh duyet vao: <strong>http://localhost:8080</strong></p>
+        </blockquote>
+      </div>`;
+    }
+  }
+
+  contentEl.innerHTML = allHtml;
+
+  // Post-process: enhance rendered HTML
+  enhanceContent();
+  setupScrollSpy();
+}
+
+// Enhance content after render
+function enhanceContent() {
+  // Auto-detect callout patterns in blockquotes and style them
+  document.querySelectorAll('#content blockquote').forEach(bq => {
+    const text = bq.textContent.toLowerCase();
+    if (text.includes('warning') || text.includes('caution') || text.includes('luu y')) {
+      bq.style.borderLeftColor = 'var(--yellow)';
+      bq.style.background = 'var(--warn-bg)';
+    } else if (text.includes('important') || text.includes('quan trong') || text.includes('danger')) {
+      bq.style.borderLeftColor = 'var(--red)';
+      bq.style.background = 'var(--danger-bg)';
+    } else if (text.includes('tip') || text.includes('hint') || text.includes('cach dung')) {
+      bq.style.borderLeftColor = 'var(--green)';
+      bq.style.background = 'var(--tip-bg)';
+    }
+  });
+}
+
+// Scroll spy + progress
+function setupScrollSpy() {
+  const mainEl = document.getElementById('main');
+  const sections = document.querySelectorAll('.chapter-section');
+  const navItems = document.querySelectorAll('.nav-item');
+  const progressFill = document.getElementById('progress-fill');
+  const sidebarProgress = document.getElementById('sidebar-progress');
+  const progressText = document.getElementById('progress-text');
+  const backToTop = document.getElementById('back-to-top');
+
+  mainEl.addEventListener('scroll', () => {
+    const scrollTop = mainEl.scrollTop;
+    const scrollHeight = mainEl.scrollHeight - mainEl.clientHeight;
+    const pct = Math.round(scrollTop / scrollHeight * 100);
+    progressFill.style.width = pct + '%';
+    sidebarProgress.style.width = pct + '%';
+    progressText.textContent = pct + '% da doc';
+
+    // Back to top button
+    backToTop.style.display = scrollTop > 400 ? 'flex' : 'none';
+
+    // Active chapter
+    let current = 0;
+    sections.forEach((section, i) => {
+      if (section.offsetTop - 120 <= scrollTop) {
+        current = i;
+      }
+    });
+
+    navItems.forEach(item => item.classList.remove('active'));
+    if (navItems[current]) {
+      navItems[current].classList.add('active');
+      navItems[current].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+  });
+}
+
+// Search
+function filterNav(query) {
+  const q = query.toLowerCase();
+  document.querySelectorAll('.nav-item').forEach((item, i) => {
+    const ch = chapters[i];
+    const match = ch.title.toLowerCase().includes(q) || ch.num.includes(q) || ch.days.toLowerCase().includes(q);
+    item.style.display = match ? '' : 'none';
+  });
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+  if (e.key === '/' && document.activeElement.tagName !== 'INPUT') {
+    e.preventDefault();
+    document.getElementById('search-input').focus();
+  }
+  if (e.key === 'Escape') {
+    document.getElementById('search-input').blur();
+    document.getElementById('search-input').value = '';
+    filterNav('');
+    document.getElementById('sidebar').classList.remove('open');
+  }
+});
+
+// Marked config
+marked.setOptions({
+  breaks: true,
+  gfm: true,
+});
+
+loadContent();
+</script>
+
+</body>
+</html>
