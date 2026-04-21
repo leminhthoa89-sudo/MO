@@ -1,0 +1,10 @@
+Request ID,Requester,Type,Offer/Publisher,Request Submitted,Priority,Direction,Description & Data,Status,SLA Deadline,Resolved At,Resolution Time (h),SLA Status,Decision,Rejection Reason,Notes
+REQ-001,AM-Linh,Payout Change,KetoBurn RU / Pub A01,2026-04-21 09:00,Urgent,AM→MO,"Request PO $8→$9. Current: 450 leads/d AR 48% (above 40% benchmark). Publisher hit cap 7/7d.",Pending,2026-04-21 13:00,,,⏳ In Window,,,
+REQ-002,AM-Linh,Commit,SlimTea MX / Pub A15,2026-04-21 09:15,Normal,AM→MO,"Publisher commits AR 37% if given 100 leads cap. Current AR 35%.",Rejected,2026-04-22 09:15,2026-04-21 10:00,1,✅ Met,Rejected,"Commit 37% only 2pp above current 35% — within variance not real commit. Demand commit ≥ 42%.",
+REQ-003,MO-Thoa,LP Issue,MaxPotency BR,2026-04-21 10:30,Urgent,MO→AM,"LP missing trust badges on mobile view. 3 publishers reported users questioning legitimacy.",Pending,2026-04-21 14:30,,,⏳ In Window,,,
+REQ-004,AM-Huy,Cap Change,JointFlex RU / Pub A02,2026-04-21 11:00,Normal,AM→MO,"Request cap 150→250. Publisher consistent 140+ leads/d 10/10d, AR 44%.",Approved,2026-04-22 11:00,2026-04-21 14:15,3,✅ Met,Approved,,,Cap increased gradually 150→200→250 over 3 days
+REQ-005,AM-Linh,Payout Change,BeautyPH / Pub A08,2026-04-21 13:00,Urgent,AM→MO,"Request PO bump to push volume 20→100. Current 20 leads/d AR 30%.",Rejected,2026-04-21 17:00,2026-04-21 14:00,1,✅ Met,Rejected,"Publisher not filling current cap (20 < cap 50). Volume issue not PO issue. Identify root cause first.",
+REQ-006,MO-Thoa,Stock Check,ParaClean RU,2026-04-21 14:00,Normal,MO→Product,"Stock level check for next week — forecast 1400 leads",Pending,2026-04-22 14:00,,,⏳ In Window,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,

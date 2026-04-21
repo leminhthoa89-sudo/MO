@@ -1,0 +1,30 @@
+MKT OPS DAILY DASHBOARD
+Last Updated:,=NOW()
+,
+ISSUE STATUS,
+Critical Open,=COUNTIFS('Issue Log'!E:E,"Critical",'Issue Log'!H:H,"Open")
+High Open,=COUNTIFS('Issue Log'!E:E,"High",'Issue Log'!H:H,"Open")
+Normal Open,=COUNTIFS('Issue Log'!E:E,"Normal",'Issue Log'!H:H,"Open")
+Total Open,=C5+C6+C7
+Resolved Today,=COUNTIFS('Issue Log'!H:H,"Resolved",'Issue Log'!I:I,">="&TODAY())
+,
+REQUEST STATUS,
+Pending Requests,=COUNTIF('Request Tracker'!I:I,"Pending")
+Overdue (Breach SLA),=COUNTIFS('Request Tracker'!I:I,"Pending",'Request Tracker'!J:J,"<"&NOW())
+Resolved Today,=COUNTIFS('Request Tracker'!I:I,"Resolved",'Request Tracker'!K:K,">="&TODAY())
+SLA Hit Rate (7d),=COUNTIFS('Request Tracker'!M:M,"✅ Met",'Request Tracker'!E:E,">="&TODAY()-7)/COUNTIFS('Request Tracker'!I:I,"Resolved",'Request Tracker'!E:E,">="&TODAY()-7)
+,
+ESCALATION STATUS,
+This Week,=COUNTIFS('Escalation Log'!B:B,">="&TODAY()-7)
+This Month,=COUNTIFS('Escalation Log'!B:B,">="&TODAY()-30)
+Unresolved,=COUNTIF('Escalation Log'!I:I,"Unresolved")
+,
+AM PROACTIVITY (THIS WEEK),
+AMs Below Target,=COUNTIF('AM Proactivity'!K:K,"🔴 Not Proactive")+COUNTIF('AM Proactivity'!K:K,"🟠 Below Target")
+AMs Meeting Target,=COUNTIF('AM Proactivity'!K:K,"🟡 Meeting Min")
+AMs Excellent,=COUNTIF('AM Proactivity'!K:K,"🟢 Excellent")
+,
+TOP 3 PRIORITIES TODAY,
+1.,
+2.,
+3.,

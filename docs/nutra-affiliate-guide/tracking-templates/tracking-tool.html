@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>MKT Ops Daily Tracker</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --card: #1c1f2e;
+    --border: #2a2d3e;
+    --text: #e0e0e0;
+    --muted: #8b8fa3;
+    --accent: #7b9aff;
+    --green: #34d399;
+    --yellow: #fbbf24;
+    --red: #f87171;
+    --orange: #fb923c;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);font-size:14px;}
+  header{background:var(--card);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;}
+  header h1{color:var(--accent);font-size:18px;}
+  .date{color:var(--muted);font-size:13px;}
+  .tabs{display:flex;gap:2px;background:var(--card);padding:0 24px;border-bottom:1px solid var(--border);overflow-x:auto;}
+  .tab{padding:12px 20px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;font-size:13px;font-weight:600;transition:all 0.15s;}
+  .tab:hover{color:var(--text);}
+  .tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+  .panel{display:none;padding:24px;}
+  .panel.active{display:block;}
+  .actions{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+  button{background:var(--accent);color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;}
+  button:hover{opacity:0.9;}
+  button.secondary{background:var(--border);color:var(--text);}
+  button.danger{background:var(--red);}
+  table{width:100%;border-collapse:collapse;background:var(--card);border-radius:8px;overflow:hidden;font-size:13px;}
+  th{background:#232740;padding:10px 12px;text-align:left;color:var(--accent);font-size:11px;text-transform:uppercase;letter-spacing:0.5px;border:1px solid #3a3f55;}
+  td{padding:8px 12px;border:1px solid #2a2f42;vertical-align:top;}
+  tr:hover td{background:rgba(123,154,255,0.05);}
+  input,select,textarea{background:var(--bg);color:var(--text);border:1px solid var(--border);padding:6px 10px;border-radius:4px;font-size:13px;width:100%;font-family:inherit;}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);}
+  .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;}
+  .kpi{background:var(--card);padding:18px;border-radius:8px;border-left:3px solid var(--accent);}
+  .kpi-label{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
+  .kpi-value{font-size:26px;font-weight:700;color:var(--text);}
+  .kpi.danger{border-left-color:var(--red);} .kpi.danger .kpi-value{color:var(--red);}
+  .kpi.warning{border-left-color:var(--yellow);} .kpi.warning .kpi-value{color:var(--yellow);}
+  .kpi.good{border-left-color:var(--green);} .kpi.good .kpi-value{color:var(--green);}
+  .badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;}
+  .b-critical{background:rgba(248,113,113,0.2);color:var(--red);}
+  .b-high{background:rgba(251,191,36,0.2);color:var(--yellow);}
+  .b-normal{background:rgba(123,154,255,0.2);color:var(--accent);}
+  .b-low{background:rgba(139,143,163,0.2);color:var(--muted);}
+  .b-open{background:rgba(248,113,113,0.2);color:var(--red);}
+  .b-progress{background:rgba(251,191,36,0.2);color:var(--yellow);}
+  .b-resolved{background:rgba(52,211,153,0.2);color:var(--green);}
+  .b-escalated{background:rgba(251,146,60,0.2);color:var(--orange);}
+  .b-pending{background:rgba(251,191,36,0.2);color:var(--yellow);}
+  .b-approved{background:rgba(52,211,153,0.2);color:var(--green);}
+  .b-rejected{background:rgba(248,113,113,0.2);color:var(--red);}
+  .overdue{background:rgba(248,113,113,0.15) !important;}
+  .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;align-items:center;justify-content:center;padding:20px;}
+  .modal.active{display:flex;}
+  .modal-content{background:var(--card);border-radius:12px;padding:24px;max-width:600px;width:100%;max-height:90vh;overflow-y:auto;}
+  .modal h2{color:var(--accent);margin-bottom:16px;}
+  .form-row{display:grid;grid-template-columns:140px 1fr;gap:12px;margin-bottom:12px;align-items:center;}
+  .form-row label{color:var(--muted);font-size:12px;}
+  .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
+  .empty{padding:40px;text-align:center;color:var(--muted);}
+  .filter-bar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+  .filter-bar select,.filter-bar input{max-width:200px;}
+  .export-bar{display:flex;gap:8px;align-items:center;margin-top:16px;padding:12px;background:var(--card);border-radius:8px;font-size:12px;color:var(--muted);}
+  .status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;}
+  h3{color:var(--accent);font-size:15px;margin:16px 0 8px;}
+  .info-box{background:rgba(123,154,255,0.08);border-left:3px solid var(--accent);padding:12px 16px;border-radius:0 8px 8px 0;font-size:13px;margin-bottom:16px;color:var(--muted);}
+  .info-box strong{color:var(--text);}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>MKT Ops Daily Tracker</h1>
+  <div class="date" id="currentDate"></div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('dashboard')">Dashboard</div>
+  <div class="tab" onclick="switchTab('issues')">Issue Log</div>
+  <div class="tab" onclick="switchTab('requests')">Request Tracker</div>
+  <div class="tab" onclick="switchTab('proactivity')">AM Proactivity</div>
+  <div class="tab" onclick="switchTab('escalations')">Escalation Log</div>
+  <div class="tab" onclick="switchTab('staff')">Staff Performance</div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="panel active" id="panel-dashboard">
+  <div class="info-box">
+    <strong>Morning routine (9:00 AM):</strong> Xem dashboard này đầu ngày — có issue critical nào? Overdue request nào? AM nào đang below target?
+  </div>
+  <div class="kpi-grid" id="kpiGrid"></div>
+  <h3>Top 5 Urgent Items</h3>
+  <table id="urgentItems"><thead><tr><th>Priority</th><th>Type</th><th>Description</th><th>Owner</th><th>Deadline</th></tr></thead><tbody></tbody></table>
+  <div class="export-bar">
+    <strong>💾 Backup:</strong>
+    <button class="secondary" onclick="exportAll()">Export All Data (JSON)</button>
+    <button class="secondary" onclick="document.getElementById('importFile').click()">Import Data</button>
+    <input type="file" id="importFile" style="display:none" accept=".json" onchange="importData(this)">
+    <span style="margin-left:auto;">Data lưu trong browser (localStorage). Export để backup/share.</span>
+  </div>
+</div>
+
+<!-- ISSUES -->
+<div class="panel" id="panel-issues">
+  <div class="actions">
+    <button onclick="openIssueModal()">+ New Issue</button>
+    <button class="secondary" onclick="exportCSV('issues')">Export CSV</button>
+  </div>
+  <div class="filter-bar">
+    <select id="issueFilterSeverity" onchange="renderIssues()">
+      <option value="">All Severities</option>
+      <option>Critical</option><option>High</option><option>Normal</option><option>Low</option>
+    </select>
+    <select id="issueFilterStatus" onchange="renderIssues()">
+      <option value="">All Status</option>
+      <option>Open</option><option>In Progress</option><option>Resolved</option><option>Escalated</option>
+    </select>
+    <input type="text" id="issueSearch" placeholder="Search..." oninput="renderIssues()">
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th><th>Raised</th><th>Type</th><th>Team</th><th>Severity</th>
+        <th>Description</th><th>Owner</th><th>Status</th><th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="issueTable"></tbody>
+  </table>
+</div>
+
+<!-- REQUESTS -->
+<div class="panel" id="panel-requests">
+  <div class="info-box">
+    <strong>Rule:</strong> Mọi request phải có data đầy đủ (performance 7d, publisher context, validation). Request thiếu data → Reject, yêu cầu bổ sung.
+  </div>
+  <div class="actions">
+    <button onclick="openRequestModal()">+ New Request</button>
+    <button class="secondary" onclick="exportCSV('requests')">Export CSV</button>
+  </div>
+  <div class="filter-bar">
+    <select id="reqFilterStatus" onchange="renderRequests()">
+      <option value="">All Status</option>
+      <option>Pending</option><option>Approved</option><option>Rejected</option><option>Resolved</option><option>Escalated</option>
+    </select>
+    <select id="reqFilterPriority" onchange="renderRequests()">
+      <option value="">All Priorities</option>
+      <option>Urgent</option><option>Normal</option>
+    </select>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th><th>Submitted</th><th>Type</th><th>Offer/Pub</th><th>Priority</th>
+        <th>Direction</th><th>SLA Deadline</th><th>SLA</th><th>Status</th><th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="requestTable"></tbody>
+  </table>
+</div>
+
+<!-- PROACTIVITY -->
+<div class="panel" id="panel-proactivity">
+  <div class="info-box">
+    <strong>Target:</strong> Mỗi AM ≥ 3 proactive actions/tuần. Review thứ 6 lúc 4PM. Score công bố cả team → peer pressure.
+  </div>
+  <div class="actions">
+    <button onclick="openAMModal()">+ Add/Update AM</button>
+    <button class="secondary" onclick="exportCSV('proactivity')">Export CSV</button>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Week</th><th>AM</th><th>Down PO</th><th>Cap Down</th><th>Warnings</th>
+        <th>Preventive</th><th>Enforce</th><th>Improvements</th><th>Counter-offer</th>
+        <th>Total</th><th>Score</th><th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="proactivityTable"></tbody>
+  </table>
+</div>
+
+<!-- ESCALATIONS -->
+<div class="panel" id="panel-escalations">
+  <div class="actions">
+    <button onclick="openEscalationModal()">+ New Escalation</button>
+    <button class="secondary" onclick="exportCSV('escalations')">Export CSV</button>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th><th>Date</th><th>Escalated By</th><th>To</th>
+        <th>From Team</th><th>To Team</th><th>Issue</th><th>Outcome</th><th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="escalationTable"></tbody>
+  </table>
+</div>
+
+<!-- STAFF -->
+<div class="panel" id="panel-staff">
+  <div class="info-box">
+    <strong>Weekly 1:1s (Friday):</strong> Dùng data này làm coaching conversations. Staff score < 6 → performance improvement plan.
+  </div>
+  <div class="actions">
+    <button onclick="openStaffModal()">+ Add/Update Staff</button>
+    <button class="secondary" onclick="exportCSV('staff')">Export CSV</button>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Week</th><th>Name</th><th>Role</th><th>Issues</th><th>Requests</th>
+        <th>SLA %</th><th>Proactive</th><th>Errors</th><th>Escalations</th>
+        <th>Score</th><th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="staffTable"></tbody>
+  </table>
+</div>
+
+<!-- MODALS -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <h2 id="modalTitle"></h2>
+    <div id="modalBody"></div>
+    <div class="modal-actions">
+      <button class="secondary" onclick="closeModal()">Cancel</button>
+      <button onclick="saveModal()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ========== STATE ==========
+const STORAGE_KEY = 'mkt_ops_tracker_v1';
+let data = {
+  issues: [],
+  requests: [],
+  proactivity: [],
+  escalations: [],
+  staff: [],
+};
+let editingType = null;
+let editingId = null;
+
+function load() {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (stored) {
+    try { data = JSON.parse(stored); } catch(e) {}
+  } else {
+    seedData();
+  }
+}
+
+function save() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  renderAll();
+}
+
+function seedData() {
+  const today = new Date().toISOString().split('T')[0];
+  data.issues = [
+    {id:'ISS-001',date:today+' 09:15',type:'Traffic Quality',team:'AM',severity:'High',desc:'Publisher A07 trash rate spike to 32%',owner:'Linh',status:'Open',resolved:'',notes:'Cap reduced pending investigation'},
+    {id:'ISS-002',date:today+' 09:30',type:'Stock/OOS',team:'Product',severity:'Critical',desc:'KetoBurn RU stock depleted',owner:'Mai',status:'In Progress',resolved:'',notes:'Sourcing alternative'},
+  ];
+  data.requests = [
+    {id:'REQ-001',requester:'AM-Linh',type:'Payout Change',offer:'KetoBurn RU / A01',submitted:today+' 09:00',priority:'Urgent',direction:'AM→MO',desc:'PO $8→$9. 450 leads/d AR 48%',status:'Pending',slaDeadline:today+' 13:00',resolvedAt:'',decision:'',notes:''},
+    {id:'REQ-002',requester:'AM-Huy',type:'Commit',offer:'SlimTea MX / A15',submitted:today+' 09:15',priority:'Normal',direction:'AM→MO',desc:'Commit AR 37% (current 35%)',status:'Rejected',slaDeadline:getSLADeadline(today+' 09:15','Normal'),resolvedAt:today+' 10:00',decision:'Rejected - commit within variance',notes:''},
+  ];
+  data.proactivity = [
+    {week:today,am:'Linh',downPO:2,capDown:1,warnings:1,preventive:3,enforce:1,improvements:1,counter:0,notes:'Excellent week'},
+    {week:today,am:'Huy',downPO:0,capDown:0,warnings:0,preventive:1,enforce:0,improvements:0,counter:0,notes:'Needs coaching on proactivity'},
+  ];
+  data.escalations = [
+    {id:'ESC-001',date:today,by:'Thoa',to:'MO Head',fromTeam:'MO',toTeam:'AM',desc:'AM submitted 3 PO requests without data',outcome:'Resolved',notes:'Template enforcement tightened'},
+  ];
+  data.staff = [
+    {week:today,name:'Linh',role:'Senior AM Exec',issues:18,requests:24,slaRate:95,proactive:5,errors:0,escalations:1,notes:'Promotion candidate'},
+    {week:today,name:'Nam',role:'Junior AM Exec',issues:8,requests:10,slaRate:70,proactive:0,errors:3,escalations:0,notes:'Coaching needed'},
+  ];
+  save();
+}
+
+// ========== HELPERS ==========
+function getSLADeadline(submitted, priority) {
+  const d = new Date(submitted);
+  const hours = priority === 'Urgent' ? 4 : 24;
+  d.setHours(d.getHours() + hours);
+  return d.toISOString().slice(0,16).replace('T',' ');
+}
+
+function isOverdue(deadline) {
+  return new Date(deadline) < new Date();
+}
+
+function nextId(prefix, arr) {
+  const nums = arr.map(x => parseInt((x.id||'').split('-')[1]||'0')).filter(n => !isNaN(n));
+  const max = nums.length ? Math.max(...nums) : 0;
+  return `${prefix}-${String(max+1).padStart(3,'0')}`;
+}
+
+function calcProactivityScore(p) {
+  const total = p.downPO + p.capDown + p.warnings + p.preventive + p.enforce + p.improvements + p.counter;
+  if (total >= 5) return {label:'🟢 Excellent',class:'good'};
+  if (total >= 3) return {label:'🟡 Meeting Min',class:'warning'};
+  if (total >= 1) return {label:'🟠 Below',class:'warning'};
+  return {label:'🔴 Not Proactive',class:'danger'};
+}
+
+function calcStaffScore(s) {
+  const slaPart = (s.slaRate/100)*3;
+  const proPart = Math.min(s.proactive/3,1)*2.5;
+  const issuePart = Math.min(s.issues/10,1)*2.5;
+  const errorPart = Math.max(10 - s.errors*2 - Math.max(s.escalations-2,0), 0) * 0.2;
+  return Math.round((slaPart + proPart + issuePart + errorPart) * 10) / 10;
+}
+
+function scoreLabel(score) {
+  if (score >= 9) return {class:'good',text:'Excellent'};
+  if (score >= 7.5) return {class:'good',text:'Meeting'};
+  if (score >= 6) return {class:'warning',text:'Below Target'};
+  return {class:'danger',text:'Concern'};
+}
+
+// ========== RENDERING ==========
+function renderDashboard() {
+  const openCritical = data.issues.filter(i=>i.severity==='Critical'&&i.status!=='Resolved').length;
+  const openHigh = data.issues.filter(i=>i.severity==='High'&&i.status!=='Resolved').length;
+  const pending = data.requests.filter(r=>r.status==='Pending').length;
+  const overdue = data.requests.filter(r=>r.status==='Pending'&&isOverdue(r.slaDeadline)).length;
+  const weekEscalations = data.escalations.filter(e=>{
+    const d = new Date(e.date); const w = new Date(); w.setDate(w.getDate()-7);
+    return d >= w;
+  }).length;
+  const amBelow = data.proactivity.filter(p=>{
+    const t = p.downPO+p.capDown+p.warnings+p.preventive+p.enforce+p.improvements+p.counter;
+    return t < 3;
+  }).length;
+
+  document.getElementById('kpiGrid').innerHTML = `
+    <div class="kpi ${openCritical?'danger':'good'}"><div class="kpi-label">Critical Issues Open</div><div class="kpi-value">${openCritical}</div></div>
+    <div class="kpi ${openHigh?'warning':'good'}"><div class="kpi-label">High Issues Open</div><div class="kpi-value">${openHigh}</div></div>
+    <div class="kpi ${pending>5?'warning':''}"><div class="kpi-label">Pending Requests</div><div class="kpi-value">${pending}</div></div>
+    <div class="kpi ${overdue?'danger':'good'}"><div class="kpi-label">🚨 Overdue Requests</div><div class="kpi-value">${overdue}</div></div>
+    <div class="kpi ${weekEscalations>3?'warning':''}"><div class="kpi-label">Escalations (7d)</div><div class="kpi-value">${weekEscalations}</div></div>
+    <div class="kpi ${amBelow?'danger':'good'}"><div class="kpi-label">AMs Below Target</div><div class="kpi-value">${amBelow}</div></div>
+  `;
+
+  // Top urgent items
+  const urgentItems = [
+    ...data.issues.filter(i=>i.severity==='Critical'&&i.status!=='Resolved').map(i=>({
+      priority:'🔴 CRITICAL',type:'Issue',desc:i.desc,owner:i.owner,deadline:'ASAP'
+    })),
+    ...data.requests.filter(r=>r.status==='Pending'&&isOverdue(r.slaDeadline)).map(r=>({
+      priority:'🚨 OVERDUE',type:'Request',desc:r.desc,owner:r.requester,deadline:r.slaDeadline
+    })),
+    ...data.issues.filter(i=>i.severity==='High'&&i.status!=='Resolved').map(i=>({
+      priority:'🟡 HIGH',type:'Issue',desc:i.desc,owner:i.owner,deadline:''
+    })),
+  ].slice(0,5);
+
+  const tbody = document.querySelector('#urgentItems tbody');
+  tbody.innerHTML = urgentItems.length
+    ? urgentItems.map(u=>`<tr><td>${u.priority}</td><td>${u.type}</td><td>${u.desc}</td><td>${u.owner||''}</td><td>${u.deadline}</td></tr>`).join('')
+    : '<tr><td colspan="5" class="empty">Không có urgent items 🎉</td></tr>';
+}
+
+function renderIssues() {
+  const sev = document.getElementById('issueFilterSeverity').value;
+  const status = document.getElementById('issueFilterStatus').value;
+  const search = document.getElementById('issueSearch').value.toLowerCase();
+
+  const filtered = data.issues.filter(i=>{
+    if (sev && i.severity !== sev) return false;
+    if (status && i.status !== status) return false;
+    if (search && !(i.desc+i.owner+i.type).toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  const tbody = document.getElementById('issueTable');
+  tbody.innerHTML = filtered.length ? filtered.map(i=>`
+    <tr>
+      <td><strong>${i.id}</strong></td>
+      <td>${i.date}</td>
+      <td>${i.type}</td>
+      <td>${i.team}</td>
+      <td><span class="badge b-${i.severity.toLowerCase()}">${i.severity}</span></td>
+      <td>${i.desc}</td>
+      <td>${i.owner}</td>
+      <td><span class="badge b-${i.status.toLowerCase().replace(' ','')}">${i.status}</span></td>
+      <td>
+        <button onclick="editItem('issues','${i.id}')" style="padding:3px 8px;font-size:11px;">Edit</button>
+        <button class="danger" onclick="deleteItem('issues','${i.id}')" style="padding:3px 8px;font-size:11px;">×</button>
+      </td>
+    </tr>
+  `).join('') : '<tr><td colspan="9" class="empty">No issues — add your first issue</td></tr>';
+}
+
+function renderRequests() {
+  const status = document.getElementById('reqFilterStatus').value;
+  const priority = document.getElementById('reqFilterPriority').value;
+
+  const filtered = data.requests.filter(r=>{
+    if (status && r.status !== status) return false;
+    if (priority && r.priority !== priority) return false;
+    return true;
+  });
+
+  const tbody = document.getElementById('requestTable');
+  tbody.innerHTML = filtered.length ? filtered.map(r=>{
+    const overdue = r.status === 'Pending' && isOverdue(r.slaDeadline);
+    const slaStatus = r.status === 'Resolved'
+      ? (new Date(r.resolvedAt) <= new Date(r.slaDeadline) ? '✅ Met' : '❌ Missed')
+      : (overdue ? '🚨 OVERDUE' : '⏳ In Window');
+    return `
+      <tr class="${overdue?'overdue':''}">
+        <td><strong>${r.id}</strong></td>
+        <td>${r.submitted}</td>
+        <td>${r.type}</td>
+        <td>${r.offer}</td>
+        <td><span class="badge b-${r.priority.toLowerCase()}">${r.priority}</span></td>
+        <td>${r.direction}</td>
+        <td>${r.slaDeadline}</td>
+        <td>${slaStatus}</td>
+        <td><span class="badge b-${r.status.toLowerCase()}">${r.status}</span></td>
+        <td>
+          <button onclick="editItem('requests','${r.id}')" style="padding:3px 8px;font-size:11px;">Edit</button>
+          <button class="danger" onclick="deleteItem('requests','${r.id}')" style="padding:3px 8px;font-size:11px;">×</button>
+        </td>
+      </tr>
+    `;
+  }).join('') : '<tr><td colspan="10" class="empty">No requests</td></tr>';
+}
+
+function renderProactivity() {
+  const tbody = document.getElementById('proactivityTable');
+  tbody.innerHTML = data.proactivity.length ? data.proactivity.map((p,idx)=>{
+    const total = p.downPO+p.capDown+p.warnings+p.preventive+p.enforce+p.improvements+p.counter;
+    const s = calcProactivityScore(p);
+    return `
+      <tr>
+        <td>${p.week}</td>
+        <td><strong>${p.am}</strong></td>
+        <td>${p.downPO}</td>
+        <td>${p.capDown}</td>
+        <td>${p.warnings}</td>
+        <td>${p.preventive}</td>
+        <td>${p.enforce}</td>
+        <td>${p.improvements}</td>
+        <td>${p.counter}</td>
+        <td><strong>${total}</strong></td>
+        <td><span class="badge b-${s.class==='good'?'resolved':s.class==='warning'?'pending':'open'}">${s.label}</span></td>
+        <td>
+          <button onclick="editItem('proactivity','${idx}')" style="padding:3px 8px;font-size:11px;">Edit</button>
+          <button class="danger" onclick="deleteItem('proactivity','${idx}')" style="padding:3px 8px;font-size:11px;">×</button>
+        </td>
+      </tr>
+    `;
+  }).join('') : '<tr><td colspan="12" class="empty">No AMs yet</td></tr>';
+}
+
+function renderEscalations() {
+  const tbody = document.getElementById('escalationTable');
+  tbody.innerHTML = data.escalations.length ? data.escalations.map(e=>`
+    <tr>
+      <td><strong>${e.id}</strong></td>
+      <td>${e.date}</td>
+      <td>${e.by}</td>
+      <td>${e.to}</td>
+      <td>${e.fromTeam}</td>
+      <td>${e.toTeam}</td>
+      <td>${e.desc}</td>
+      <td><span class="badge b-${(e.outcome||'').toLowerCase().includes('resolv')?'resolved':'pending'}">${e.outcome||'Open'}</span></td>
+      <td>
+        <button onclick="editItem('escalations','${e.id}')" style="padding:3px 8px;font-size:11px;">Edit</button>
+        <button class="danger" onclick="deleteItem('escalations','${e.id}')" style="padding:3px 8px;font-size:11px;">×</button>
+      </td>
+    </tr>
+  `).join('') : '<tr><td colspan="9" class="empty">No escalations</td></tr>';
+}
+
+function renderStaff() {
+  const tbody = document.getElementById('staffTable');
+  tbody.innerHTML = data.staff.length ? data.staff.map((s,idx)=>{
+    const score = calcStaffScore(s);
+    const lbl = scoreLabel(score);
+    return `
+      <tr>
+        <td>${s.week}</td>
+        <td><strong>${s.name}</strong></td>
+        <td>${s.role}</td>
+        <td>${s.issues}</td>
+        <td>${s.requests}</td>
+        <td>${s.slaRate}%</td>
+        <td>${s.proactive}</td>
+        <td>${s.errors}</td>
+        <td>${s.escalations}</td>
+        <td><strong>${score}</strong> <span class="badge b-${lbl.class==='good'?'resolved':lbl.class==='warning'?'pending':'open'}">${lbl.text}</span></td>
+        <td>
+          <button onclick="editItem('staff','${idx}')" style="padding:3px 8px;font-size:11px;">Edit</button>
+          <button class="danger" onclick="deleteItem('staff','${idx}')" style="padding:3px 8px;font-size:11px;">×</button>
+        </td>
+      </tr>
+    `;
+  }).join('') : '<tr><td colspan="11" class="empty">No staff yet</td></tr>';
+}
+
+function renderAll() {
+  renderDashboard();
+  renderIssues();
+  renderRequests();
+  renderProactivity();
+  renderEscalations();
+  renderStaff();
+}
+
+// ========== TABS ==========
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('panel-'+tab).classList.add('active');
+}
+
+// ========== MODALS ==========
+function openIssueModal(item) {
+  editingType='issues'; editingId = item ? item.id : null;
+  const i = item || {id:nextId('ISS',data.issues),date:new Date().toISOString().slice(0,16).replace('T',' '),type:'Traffic Quality',team:'AM',severity:'Normal',desc:'',owner:'',status:'Open',resolved:'',notes:''};
+  document.getElementById('modalTitle').textContent = item ? 'Edit Issue' : 'New Issue';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="form-row"><label>ID</label><input id="f-id" value="${i.id}" readonly></div>
+    <div class="form-row"><label>Date Raised</label><input id="f-date" value="${i.date}"></div>
+    <div class="form-row"><label>Type</label><select id="f-type">
+      ${['Traffic Quality','Stock/OOS','Payment','Tracking','LP Issue','Call Center','Other'].map(t=>`<option ${i.type===t?'selected':''}>${t}</option>`).join('')}
+    </select></div>
+    <div class="form-row"><label>Team</label><select id="f-team">
+      ${['AM','Call Center','Finance','Product','Tech','Publisher','Internal Ops'].map(t=>`<option ${i.team===t?'selected':''}>${t}</option>`).join('')}
+    </select></div>
+    <div class="form-row"><label>Severity</label><select id="f-severity">
+      ${['Critical','High','Normal','Low'].map(t=>`<option ${i.severity===t?'selected':''}>${t}</option>`).join('')}
+    </select></div>
+    <div class="form-row"><label>Description</label><textarea id="f-desc" rows="3">${i.desc}</textarea></div>
+    <div class="form-row"><label>Owner</label><input id="f-owner" value="${i.owner}"></div>
+    <div class="form-row"><label>Status</label><select id="f-status">
+      ${['Open','In Progress','Resolved','Escalated'].map(t=>`<option ${i.status===t?'selected':''}>${t}</option>`).join('')}
+    </select></div>
+    <div class="form-row"><label>Notes</label><textarea id="f-notes" rows="2">${i.notes||''}</textarea></div>
+  `;
+  document.getElementById('modal').classList.add('active');
+}
+
+function openRequestModal(item) {
+  editingType='requests'; editingId = item ? item.id : null;
+  const submitted = new Date().toISOString().slice(0,16).replace('T',' ');
+  const r = item || {id:nextId('REQ',data.requests),requester:'',type:'Payout Change',offer:'',submitted:submitted,priority:'Normal',direction:'AM→MO',desc:'',status:'Pending',slaDeadline:getSLADeadline(submitted,'Normal'),resolvedAt:'',decision:'',notes:''};
+  document.getElementById('modalTitle').textContent = item ? 'Edit Request' : 'New Request';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="form-row"><label>ID</label><input id="f-id" value="${r.id}" readonly></div>
+    <div class="form-row"><label>Requester</label><input id="f-requester" value="${r.requester}"></div>
+    <div class="form-row"><label>Type</label><select id="f-type">
+      ${['Payout Change','Cap Change','New Deal','Commit','LP Issue','Stock Check','Other'].map(t=>`<option ${r.type===t?'selected':''}>${t}</option>`).join('')}
+    </select></div>
+    <div class="form-row"><label>Offer/Publisher</label><input id="f-offer" value="${r.offer}"></div>
+    <div class="form-row"><label>Submitted</label><input id="f-submitted" value="${r.submitted}"></div>
+    <div class="form-row"><label>Priority</label><select id="f-priority" onchange="document.getElementById('f-slaDeadline').value=getSLADeadlineFromForm()">
+      <option ${r.priority==='Urgent'?'selected':''}>Urgent</option>
+      <option ${r.priority==='Normal'?'selected':''}>Normal</option>
+    </select></div>
+    <div class="form-row"><label>Direction</label><select id="f-direction">
+      ${['AM→MO','MO→AM','MO→CC','MO→Finance','MO→Product','MO→Tech'].map(t=>`<option ${r.direction===t?'selected':''}>${t}</option>`).join('')}
+    </select></div>
+    <div class="form-row"><label>Description & Data</label><textarea id="f-desc" rows="4">${r.desc}</textarea></div>
+    <div class="form-row"><label>SLA Deadline</label><input id="f-slaDeadline" value="${r.slaDeadline}"></div>
+    <div class="form-row"><label>Status</label><select id="f-status">
+      ${['Pending','Approved','Rejected','Resolved','Escalated'].map(t=>`<option ${r.status===t?'selected':''}>${t}</option>`).join('')}
+    </select></div>
+    <div class="form-row"><label>Resolved At</label><input id="f-resolvedAt" value="${r.resolvedAt||''}"></div>
+    <div class="form-row"><label>Decision</label><textarea id="f-decision" rows="2">${r.decision||''}</textarea></div>
+  `;
+  document.getElementById('modal').classList.add('active');
+}
+
+function getSLADeadlineFromForm() {
+  return getSLADeadline(document.getElementById('f-submitted').value, document.getElementById('f-priority').value);
+}
+
+function openAMModal(item) {
+  editingType='proactivity'; editingId = item ? item.idx : null;
+  const p = item || {week:new Date().toISOString().split('T')[0],am:'',downPO:0,capDown:0,warnings:0,preventive:0,enforce:0,improvements:0,counter:0,notes:''};
+  document.getElementById('modalTitle').textContent = item ? 'Edit AM Performance' : 'Add AM Performance';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="form-row"><label>Week (Monday)</label><input id="f-week" type="date" value="${p.week}"></div>
+    <div class="form-row"><label>AM Name</label><input id="f-am" value="${p.am}"></div>
+    <div class="form-row"><label>Down PO Negotiations</label><input id="f-downPO" type="number" value="${p.downPO}" min="0"></div>
+    <div class="form-row"><label>Cap Down Actions</label><input id="f-capDown" type="number" value="${p.capDown}" min="0"></div>
+    <div class="form-row"><label>Publisher Warnings</label><input id="f-warnings" type="number" value="${p.warnings}" min="0"></div>
+    <div class="form-row"><label>Preventive Flags</label><input id="f-preventive" type="number" value="${p.preventive}" min="0"></div>
+    <div class="form-row"><label>Enforce Consequences</label><input id="f-enforce" type="number" value="${p.enforce}" min="0"></div>
+    <div class="form-row"><label>Data-backed Improvements</label><input id="f-improvements" type="number" value="${p.improvements}" min="0"></div>
+    <div class="form-row"><label>Counter Competitor</label><input id="f-counter" type="number" value="${p.counter}" min="0"></div>
+    <div class="form-row"><label>Notes</label><textarea id="f-notes" rows="2">${p.notes}</textarea></div>
+  `;
+  document.getElementById('modal').classList.add('active');
+}
+
+function openEscalationModal(item) {
+  editingType='escalations'; editingId = item ? item.id : null;
+  const e = item || {id:nextId('ESC',data.escalations),date:new Date().toISOString().split('T')[0],by:'',to:'',fromTeam:'MO',toTeam:'AM',desc:'',outcome:'Open',notes:''};
+  document.getElementById('modalTitle').textContent = item ? 'Edit Escalation' : 'New Escalation';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="form-row"><label>ID</label><input id="f-id" value="${e.id}" readonly></div>
+    <div class="form-row"><label>Date</label><input id="f-date" type="date" value="${e.date}"></div>
+    <div class="form-row"><label>Escalated By</label><input id="f-by" value="${e.by}"></div>
+    <div class="form-row"><label>Escalated To</label><input id="f-to" value="${e.to}"></div>
+    <div class="form-row"><label>From Team</label><select id="f-fromTeam">
+      ${['MO','AM','CC','Finance','Product','Tech'].map(t=>`<option ${e.fromTeam===t?'selected':''}>${t}</option>`).join('')}
+    </select></div>
+    <div class="form-row"><label>To Team</label><select id="f-toTeam">
+      ${['MO','AM','CC','Finance','Product','Tech'].map(t=>`<option ${e.toTeam===t?'selected':''}>${t}</option>`).join('')}
+    </select></div>
+    <div class="form-row"><label>Issue Description</label><textarea id="f-desc" rows="3">${e.desc}</textarea></div>
+    <div class="form-row"><label>Outcome</label><select id="f-outcome">
+      ${['Open','Resolved','Escalated Further','Unresolved'].map(t=>`<option ${e.outcome===t?'selected':''}>${t}</option>`).join('')}
+    </select></div>
+    <div class="form-row"><label>Notes</label><textarea id="f-notes" rows="2">${e.notes}</textarea></div>
+  `;
+  document.getElementById('modal').classList.add('active');
+}
+
+function openStaffModal(item) {
+  editingType='staff'; editingId = item ? item.idx : null;
+  const s = item || {week:new Date().toISOString().split('T')[0],name:'',role:'AM Exec',issues:0,requests:0,slaRate:90,proactive:0,errors:0,escalations:0,notes:''};
+  document.getElementById('modalTitle').textContent = item ? 'Edit Staff Metric' : 'Add Staff Metric';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="form-row"><label>Week (Monday)</label><input id="f-week" type="date" value="${s.week}"></div>
+    <div class="form-row"><label>Name</label><input id="f-name" value="${s.name}"></div>
+    <div class="form-row"><label>Role</label><input id="f-role" value="${s.role}"></div>
+    <div class="form-row"><label>Issues Handled</label><input id="f-issues" type="number" value="${s.issues}" min="0"></div>
+    <div class="form-row"><label>Requests Resolved</label><input id="f-requests" type="number" value="${s.requests}" min="0"></div>
+    <div class="form-row"><label>SLA Hit Rate %</label><input id="f-slaRate" type="number" value="${s.slaRate}" min="0" max="100"></div>
+    <div class="form-row"><label>Proactive Flags</label><input id="f-proactive" type="number" value="${s.proactive}" min="0"></div>
+    <div class="form-row"><label>Errors/Rework</label><input id="f-errors" type="number" value="${s.errors}" min="0"></div>
+    <div class="form-row"><label>Escalations Raised</label><input id="f-escalations" type="number" value="${s.escalations}" min="0"></div>
+    <div class="form-row"><label>Coaching Notes</label><textarea id="f-notes" rows="3">${s.notes}</textarea></div>
+  `;
+  document.getElementById('modal').classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('active');
+  editingType = null; editingId = null;
+}
+
+function saveModal() {
+  const get = id => document.getElementById(id).value;
+  const getNum = id => parseInt(document.getElementById(id).value) || 0;
+
+  if (editingType === 'issues') {
+    const item = {id:get('f-id'),date:get('f-date'),type:get('f-type'),team:get('f-team'),severity:get('f-severity'),desc:get('f-desc'),owner:get('f-owner'),status:get('f-status'),resolved:'',notes:get('f-notes')};
+    if (editingId) data.issues = data.issues.map(x => x.id === editingId ? item : x);
+    else data.issues.push(item);
+  }
+  else if (editingType === 'requests') {
+    const item = {id:get('f-id'),requester:get('f-requester'),type:get('f-type'),offer:get('f-offer'),submitted:get('f-submitted'),priority:get('f-priority'),direction:get('f-direction'),desc:get('f-desc'),slaDeadline:get('f-slaDeadline'),status:get('f-status'),resolvedAt:get('f-resolvedAt'),decision:get('f-decision')};
+    if (editingId) data.requests = data.requests.map(x => x.id === editingId ? item : x);
+    else data.requests.push(item);
+  }
+  else if (editingType === 'proactivity') {
+    const item = {week:get('f-week'),am:get('f-am'),downPO:getNum('f-downPO'),capDown:getNum('f-capDown'),warnings:getNum('f-warnings'),preventive:getNum('f-preventive'),enforce:getNum('f-enforce'),improvements:getNum('f-improvements'),counter:getNum('f-counter'),notes:get('f-notes')};
+    if (editingId !== null) data.proactivity[parseInt(editingId)] = item;
+    else data.proactivity.push(item);
+  }
+  else if (editingType === 'escalations') {
+    const item = {id:get('f-id'),date:get('f-date'),by:get('f-by'),to:get('f-to'),fromTeam:get('f-fromTeam'),toTeam:get('f-toTeam'),desc:get('f-desc'),outcome:get('f-outcome'),notes:get('f-notes')};
+    if (editingId) data.escalations = data.escalations.map(x => x.id === editingId ? item : x);
+    else data.escalations.push(item);
+  }
+  else if (editingType === 'staff') {
+    const item = {week:get('f-week'),name:get('f-name'),role:get('f-role'),issues:getNum('f-issues'),requests:getNum('f-requests'),slaRate:getNum('f-slaRate'),proactive:getNum('f-proactive'),errors:getNum('f-errors'),escalations:getNum('f-escalations'),notes:get('f-notes')};
+    if (editingId !== null) data.staff[parseInt(editingId)] = item;
+    else data.staff.push(item);
+  }
+
+  save();
+  closeModal();
+}
+
+function editItem(type, id) {
+  if (type === 'issues' || type === 'requests' || type === 'escalations') {
+    const item = data[type].find(x => x.id === id);
+    if (type === 'issues') openIssueModal(item);
+    else if (type === 'requests') openRequestModal(item);
+    else if (type === 'escalations') openEscalationModal(item);
+  } else {
+    const item = {...data[type][parseInt(id)], idx: id};
+    if (type === 'proactivity') openAMModal(item);
+    else if (type === 'staff') openStaffModal(item);
+  }
+}
+
+function deleteItem(type, id) {
+  if (!confirm('Delete this item?')) return;
+  if (type === 'issues' || type === 'requests' || type === 'escalations') {
+    data[type] = data[type].filter(x => x.id !== id);
+  } else {
+    data[type].splice(parseInt(id), 1);
+  }
+  save();
+}
+
+// ========== EXPORT / IMPORT ==========
+function exportAll() {
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `mkt-ops-tracker-${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+}
+
+function importData(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      if (!confirm('This will REPLACE all current data. Continue?')) return;
+      data = JSON.parse(e.target.result);
+      save();
+      alert('Imported successfully!');
+    } catch(err) { alert('Invalid file'); }
+  };
+  reader.readAsText(file);
+}
+
+function exportCSV(type) {
+  const arr = data[type];
+  if (!arr.length) { alert('No data'); return; }
+  const headers = Object.keys(arr[0]);
+  const rows = arr.map(r => headers.map(h => {
+    const v = (r[h]||'').toString().replace(/"/g, '""');
+    return `"${v}"`;
+  }).join(','));
+  const csv = headers.join(',') + '\n' + rows.join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${type}-${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+}
+
+// ========== INIT ==========
+document.getElementById('currentDate').textContent = new Date().toLocaleDateString('vi-VN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+load();
+renderAll();
+</script>
+
+</body>
+</html>

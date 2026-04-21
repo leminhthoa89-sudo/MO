@@ -1,0 +1,17 @@
+Week Of,Staff Name,Role,Issues Handled,Requests Resolved,SLA Hit Rate %,Proactive Flags,Errors/Rework,Escalations Raised,Weekly Score (1-10),Strength This Week,Area to Improve,Coaching Notes
+2026-04-21,Linh,Senior AM Exec,18,24,95,5,0,1,9.2,"Excellent proactive with Publisher A07 — caught trash spike early","Push back more on advertiser unreasonable requests","Discussed in 1:1 4/18"
+2026-04-21,Huy,AM Exec,12,15,80,1,2,2,6.5,"Good attention to detail on LP issues","Proactivity — mostly reactive this week","Schedule proactivity coaching session"
+2026-04-21,Mai,Operations Analyst,25,18,98,8,0,0,9.5,"Outstanding — caught 3 tracking issues before they impacted revenue","Share methodology with team","Candidate for promotion consideration"
+2026-04-21,Nam,Junior AM Exec,8,10,70,0,3,0,5.0,"Completing tasks","SLA compliance + proactivity + accuracy","Needs structured coaching plan — 3 rework incidents"
+2026-04-21,Phuc,Fraud Analyst,14,11,92,6,0,1,8.5,"Detected fraud pattern on Publisher A15 early","Documentation of findings could be clearer","Good progress from last month"
+,,,,,,,,,,,,
+WEEKLY TARGETS,,,≥ 10,≥ 10,≥ 90%,≥ 3,= 0,≤ 2,≥ 7.5,,,
+,,,,,,,,,,,,
+SCORE FORMULA:,,,,,,,,,,,,
+"=ROUND((SLA%/100*3) + (MIN(Proactive/3,1)*2.5) + (MIN(Issues/10,1)*2.5) + MAX(10-Errors*2-MAX(Escalations-2,0),0)*0.2, 1)",,,,,,,,,,,,
+,,,,,,,,,,,,
+SCORE INTERPRETATION:,,,,,,,,,,,,
+9.0+,Excellent — promotion/raise candidate,,,,,,,,,,,
+7.5-8.9,Meeting expectations — continue growth,,,,,,,,,,,
+6.0-7.4,Below target — coaching needed,,,,,,,,,,,
+Below 6.0,Serious concern — performance improvement plan,,,,,,,,,,,

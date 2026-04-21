@@ -1,0 +1,13 @@
+Issue ID,Date Raised,Type,Team Involved,Severity,Description,Owner,Status,Resolved Date,Root Cause,Action Taken,Notes
+ISS-001,2026-04-21 09:15,Traffic Quality,AM,High,"Publisher A07 trash rate spike to 32% in last 24h",Thoa,Open,,Traffic source changed from FB to Push,Cap reduced to 50 pending investigation,
+ISS-002,2026-04-21 09:30,Stock/OOS,Product,Critical,"KetoBurn RU warehouse stock depleted - 3 days no restock",Mai,In Progress,,Production delay from supplier,Paused offer + sourcing alternative SKU,
+ISS-003,2026-04-21 10:05,Call Center,Call Center RU,Normal,"Contact rate dropped 15% in RU yesterday",Huy,Open,,,Awaiting CC response,
+ISS-004,2026-04-21 10:45,LP Issue,AM,Normal,"Publisher A03 LP missing price on mobile",Thoa,Resolved,2026-04-21 11:20,LP template bug,Publisher updated LP with correct price,
+ISS-005,2026-04-21 11:00,Tracking,Tech,High,"Conversions not firing for offer ID 1234 since 10:30 AM",Nam,In Progress,,Postback URL misconfigured,Tech fixing + will backfill conversions,
+ISS-006,2026-04-21 13:20,Payment,Finance,Normal,"Affiliate A12 payment delayed 2 days",Linh,Open,,Finance waiting on advertiser payment,AR team following up with advertiser,
+,,,,,,,,,,,
+,,,,,,,,,,,
+,,,,,,,,,,,
+,,,,,,,,,,,
+,,,,,,,,,,,
+,,,,,,,,,,,

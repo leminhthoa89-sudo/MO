@@ -1,0 +1,11 @@
+Escalation ID,Date Raised,Escalated By,Escalated To,From Team,To Team,Issue Description,Resolution Time (h),Outcome,Root Cause,Process Gap Identified,Action to Prevent
+ESC-001,2026-04-20,Thoa (MO),MO Head,MO,AM,"AM Linh requested payout bump with insufficient data 3 times this week. Rejected each. AM pushing back requesting exception.",24,Resolved,AM process not enforcing data-backed requests,"Need stricter template enforcement","Rolled out mandatory request template. Rejected requests without full template."
+ESC-002,2026-04-19,Linh (AM),AM Head,AM,Product,"Stock forecast for KetoBurn RU not received within 24h SLA. Risk OOS next week.",48,Escalated Further,"Product team communication gap","No SLA defined MO→Product","Set up MO-Product weekly sync + SLA matrix"
+ESC-003,2026-04-18,Huy (AM),AM Head,AM,MO,"Urgent LP fix request submitted 9AM not acknowledged by 2PM. 3 publishers pausing campaigns.",5,Resolved,MO staff overloaded morning,"Need triage system for urgent requests","Implemented 2-tier queue: urgent vs normal with separate handlers"
+,,,,,,,,,,,
+,,,,,,,,,,,
+MONTHLY PATTERNS,,,,,,,,,,,
+Team Most Escalated TO: ,,,,,,,,,,,
+Team Most Escalated FROM: ,,,,,,,,,,,
+Most Common Root Cause: ,,,,,,,,,,,
+Resolution Time Avg: ,,,,,,,,,,,
